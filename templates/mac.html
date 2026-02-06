@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MAC App | Advanced Dashboard</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+          darkMode: 'class',
+          theme: {
+            extend: {
+              colors: {
+                steel: {
+                  50: '#f0f7ff',
+                  100: '#e0effe',
+                  200: '#bae2fd',
+                  300: '#7dd1fc',
+                  400: '#38bdf8',
+                  500: '#0ea5e9',
+                  600: '#0284c7',
+                  700: '#0369a1',
+                  800: '#075985', 
+                  900: '#0c4a6e',
+                  950: '#082f49',
+                }
+              },
+              animation: {
+                  'fade-in': 'fadeIn 0.3s ease-out',
+                  'slide-up': 'slideUp 0.4s ease-out',
+                  'bounce-short': 'bounceShort 0.5s ease-in-out',
+              },
+              keyframes: {
+                  fadeIn: {
+                      '0%': { opacity: '0' },
+                      '100%': { opacity: '1' },
+                  },
+                  slideUp: {
+                      '0%': { transform: 'translateY(20px)', opacity: '0' },
+                      '100%': { transform: 'translateY(0)', opacity: '1' },
+                  },
+                  bounceShort: {
+                      '0%, 100%': { transform: 'translateY(0)' },
+                      '50%': { transform: 'translateY(-5px)' },
+                  }
+              }
+            }
+          }
+        }
+      </script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Roboto:wght@300;400;500;700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            overflow: hidden; /* App-like behavior */
+        }
+        
+        h1, h2, h3, .brand-font {
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .verse-font {
+            font-family: 'Merriweather', serif;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #334155;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Transitions */
+        .view-section {
+            display: none;
+        }
+        .view-section.active {
+            display: block;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        /* Active Nav States */
+        .nav-item.active {
+            color: #0369a1; 
+            background-color: #e0effe; 
+            border-right: 4px solid #0369a1;
+        }
+        .dark .nav-item.active {
+            color: #38bdf8;
+            background-color: #0c4a6e;
+            border-right: 4px solid #38bdf8;
+        }
+
+        .mobile-nav-item.active {
+            color: #0369a1;
+        }
+        .dark .mobile-nav-item.active {
+            color: #38bdf8;
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+        }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col md:flex-row bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 transition-colors duration-300">
+
+    <!-- DESKTOP SIDEBAR -->
+    <aside class="hidden md:flex flex-col w-72 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 h-full shadow-sm z-20 transition-colors duration-300">
+        <div class="p-6 flex items-center justify-between">
+            <span class="text-3xl font-black tracking-tighter text-slate-900 dark:text-white brand-font">MAC<span class="text-steel-600 dark:text-steel-400">.</span></span>
+            <button onclick="toggleTheme()" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-yellow-400 hover:scale-110 transition">
+                <i class="fas fa-moon dark:hidden"></i>
+                <i class="fas fa-sun hidden dark:block"></i>
+            </button>
+        </div>
+
+        <div class="px-6 mb-4">
+             <div class="relative">
+                <i class="fas fa-search absolute left-3 top-3 text-slate-400"></i>
+                <input type="text" id="globalSearch" onkeyup="handleSearch()" placeholder="Search..." class="w-full bg-slate-100 dark:bg-slate-900 border-none rounded-xl py-2.5 pl-10 pr-4 text-sm focus:ring-2 focus:ring-steel-500 outline-none transition-all dark:text-white">
+             </div>
+        </div>
+
+        <nav class="flex-1 px-4 space-y-1">
+            <button onclick="switchTab('home')" id="nav-home" class="nav-item active w-full flex items-center gap-4 px-4 py-3 rounded-lg text-slate-500 dark:text-slate-400 font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+                <i class="fas fa-home text-lg w-6 text-center"></i> Home
+            </button>
+            <button onclick="switchTab('verse')" id="nav-verse" class="nav-item w-full flex items-center gap-4 px-4 py-3 rounded-lg text-slate-500 dark:text-slate-400 font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+                <i class="fas fa-book-open text-lg w-6 text-center"></i> MACverse
+            </button>
+            <button onclick="switchTab('events')" id="nav-events" class="nav-item w-full flex items-center gap-4 px-4 py-3 rounded-lg text-slate-500 dark:text-slate-400 font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+                <i class="fas fa-calendar-alt text-lg w-6 text-center"></i> Events
+                <span class="ml-auto bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full" id="event-badge">3</span>
+            </button>
+            <button onclick="switchTab('works')" id="nav-works" class="nav-item w-full flex items-center gap-4 px-4 py-3 rounded-lg text-slate-500 dark:text-slate-400 font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+                <i class="fas fa-layer-group text-lg w-6 text-center"></i> MacWorks
+            </button>
+            <button onclick="switchTab('team')" id="nav-team" class="nav-item w-full flex items-center gap-4 px-4 py-3 rounded-lg text-slate-500 dark:text-slate-400 font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+                <i class="fas fa-users text-lg w-6 text-center"></i> MACers
+            </button>
+        </nav>
+
+        <div class="p-4 mt-auto">
+            <button onclick="showToast('Redirecting to secure giving portal...', 'info')" class="w-full bg-gradient-to-r from-slate-900 to-slate-800 dark:from-steel-600 dark:to-steel-800 text-white py-3.5 rounded-xl font-bold shadow-lg shadow-slate-900/20 hover:shadow-xl hover:scale-[1.02] transition active:scale-95">
+                <i class="fas fa-hand-holding-heart mr-2"></i> Give
+            </button>
+        </div>
+        
+        <div class="p-4 border-t border-slate-100 dark:border-slate-800 flex items-center gap-3 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-900 transition">
+             <div class="w-10 h-10 rounded-full bg-steel-100 dark:bg-slate-800 flex items-center justify-center text-steel-700 dark:text-steel-400 font-bold border-2 border-white dark:border-slate-700 shadow-sm">
+                <img src="https://ui-avatars.com/api/?name=User&background=0ea5e9&color=fff" class="rounded-full">
+             </div>
+             <div class="text-sm">
+                 <p class="font-bold text-slate-900 dark:text-white">Guest User</p>
+                 <p class="text-slate-400 text-xs">View Profile</p>
+             </div>
+             <i class="fas fa-chevron-right ml-auto text-slate-300 text-xs"></i>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-1 flex flex-col h-full relative overflow-hidden bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
+        
+        <!-- App Header (Mobile & Desktop) -->
+        <header class="h-16 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 md:px-8 z-10 sticky top-0">
+            <div class="md:hidden flex items-center gap-3">
+                <button onclick="toggleTheme()" class="text-slate-500 dark:text-slate-300">
+                    <i class="fas fa-moon dark:hidden"></i>
+                    <i class="fas fa-sun hidden dark:block"></i>
+                </button>
+                <span class="text-2xl font-black text-slate-900 dark:text-white brand-font">MAC<span class="text-steel-600">.</span></span>
+            </div>
+            
+            <h2 id="page-title" class="hidden md:block text-xl font-bold text-slate-800 dark:text-slate-100 transition-all duration-300">Dashboard</h2>
+            
+            <div class="flex items-center gap-4">
+                <div class="relative" id="notification-container">
+                    <button onclick="toggleNotifications()" class="w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-steel-600 dark:hover:text-steel-400 transition relative">
+                        <i class="fas fa-bell"></i>
+                        <span class="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-slate-800 animate-pulse"></span>
+                    </button>
+                    <!-- Notification Dropdown -->
+                    <div id="notification-dropdown" class="hidden absolute right-0 top-12 w-80 bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-100 dark:border-slate-800 z-50 overflow-hidden transform origin-top-right transition-all">
+                        <div class="p-3 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                            <span class="font-bold text-sm">Notifications</span>
+                            <span class="text-xs text-steel-500 cursor-pointer">Mark all read</span>
+                        </div>
+                        <div class="max-h-64 overflow-y-auto">
+                            <div class="p-3 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer flex gap-3 border-b border-slate-50 dark:border-slate-800/50">
+                                <div class="w-8 h-8 rounded-full bg-red-100 text-red-500 flex items-center justify-center flex-shrink-0"><i class="fas fa-video"></i></div>
+                                <div>
+                                    <p class="text-xs font-bold text-slate-800 dark:text-slate-200">Live: Sunday Service</p>
+                                    <p class="text-[10px] text-slate-500">Started 5 minutes ago</p>
+                                </div>
+                            </div>
+                            <div class="p-3 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer flex gap-3">
+                                <div class="w-8 h-8 rounded-full bg-steel-100 text-steel-500 flex items-center justify-center flex-shrink-0"><i class="fas fa-calendar"></i></div>
+                                <div>
+                                    <p class="text-xs font-bold text-slate-800 dark:text-slate-200">Event Reminder</p>
+                                    <p class="text-[10px] text-slate-500">Prayer meeting in 1 hour</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="md:hidden w-8 h-8 rounded-full bg-steel-600 flex items-center justify-center text-white text-xs font-bold border-2 border-white shadow-sm">U</div>
+            </div>
+        </header>
+
+        <!-- Scrollable Content Container -->
+        <div class="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-8 pb-24 md:pb-8 scroll-smooth" id="main-scroll">
+            
+            <!-- VIEW: HOME DASHBOARD -->
+            <div id="view-home" class="view-section active max-w-6xl mx-auto">
+                <!-- Dynamic Greeting -->
+                <div class="mb-6 animate-fade-in">
+                    <h1 class="text-2xl md:text-3xl font-black text-slate-900 dark:text-white" id="greeting-text">Hello, User 👋</h1>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm">Here is what's happening in the MAC community today.</p>
+                </div>
+
+                <!-- Hero Banner -->
+                <div class="bg-gradient-to-r from-slate-900 to-slate-800 dark:from-steel-900 dark:to-slate-950 rounded-3xl p-6 md:p-10 text-white mb-8 shadow-xl relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-80 h-80 bg-steel-500/30 rounded-full mix-blend-overlay filter blur-3xl -mr-20 -mt-20 group-hover:scale-110 transition duration-1000"></div>
+                    <div class="relative z-10">
+                        <span class="inline-block px-3 py-1 rounded-full bg-white/10 backdrop-blur border border-white/20 text-xs font-bold uppercase tracking-wider mb-4 animate-bounce-short">Featured</span>
+                        <h2 class="text-2xl md:text-5xl font-black brand-font mb-3">Ignite The Fire</h2>
+                        <p class="text-slate-300 max-w-lg mb-8 text-sm md:text-base leading-relaxed">Join us this weekend for a special series on rediscovering your passion for the Gospel.</p>
+                        <div class="flex flex-wrap gap-3">
+                            <button onclick="openModal('video', {title: 'Ignite The Fire - Trailer'})" class="bg-steel-500 hover:bg-steel-400 text-white px-6 py-3 rounded-xl font-bold text-sm transition shadow-lg shadow-steel-500/30 flex items-center gap-2">
+                                <i class="fas fa-play"></i> Watch Trailer
+                            </button>
+                            <button onclick="switchTab('events')" class="bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-xl font-bold text-sm transition backdrop-blur-sm border border-white/10">
+                                View Schedule
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Stats / Shortcuts -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <div onclick="switchTab('verse')" class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 hover:-translate-y-1 transition cursor-pointer">
+                        <div class="w-10 h-10 rounded-full bg-orange-100 dark:bg-orange-900/50 text-orange-600 dark:text-orange-400 flex items-center justify-center mb-3"><i class="fas fa-bible"></i></div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Daily</p>
+                        <h3 class="font-bold text-slate-900 dark:text-white">Verse</h3>
+                    </div>
+                    <div onclick="switchTab('events')" class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 hover:-translate-y-1 transition cursor-pointer">
+                        <div class="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400 flex items-center justify-center mb-3"><i class="fas fa-calendar-check"></i></div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">3 Upcoming</p>
+                        <h3 class="font-bold text-slate-900 dark:text-white">Events</h3>
+                    </div>
+                    <div onclick="switchTab('works')" class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 hover:-translate-y-1 transition cursor-pointer">
+                        <div class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400 flex items-center justify-center mb-3"><i class="fas fa-images"></i></div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Gallery</p>
+                        <h3 class="font-bold text-slate-900 dark:text-white">Photos</h3>
+                    </div>
+                    <div onclick="switchTab('team')" class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 hover:-translate-y-1 transition cursor-pointer">
+                        <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-3"><i class="fas fa-users"></i></div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Connect</p>
+                        <h3 class="font-bold text-slate-900 dark:text-white">Team</h3>
+                    </div>
+                </div>
+
+                <!-- Recent Activity Feed (Generated via JS) -->
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-slate-900 dark:text-white font-bold text-lg">Community Feed</h3>
+                    <button class="text-steel-600 dark:text-steel-400 text-xs font-bold hover:underline">View All</button>
+                </div>
+                <div class="space-y-4" id="home-feed-container">
+                    <!-- Feed items injected by JS -->
+                </div>
+            </div>
+
+            <!-- VIEW: MACVERSE -->
+            <div id="view-verse" class="view-section max-w-3xl mx-auto h-full flex flex-col justify-center">
+                <div id="verse-card-container">
+                    <!-- Dynamic Verse Card -->
+                </div>
+                
+                <div class="mt-8 flex justify-center gap-2">
+                    <button onclick="previousVerse()" class="w-10 h-10 rounded-full bg-white dark:bg-slate-800 shadow text-slate-400 hover:text-steel-600 hover:scale-110 transition"><i class="fas fa-chevron-left"></i></button>
+                    <button onclick="nextVerse()" class="w-10 h-10 rounded-full bg-white dark:bg-slate-800 shadow text-slate-400 hover:text-steel-600 hover:scale-110 transition"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+
+            <!-- VIEW: EVENTS -->
+            <div id="view-events" class="view-section max-w-4xl mx-auto">
+                <div class="flex flex-col md:flex-row justify-between items-end md:items-center mb-6 gap-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Upcoming Events</h2>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm">Don't miss out on what God is doing.</p>
+                    </div>
+                    <div class="flex bg-white dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700">
+                        <button onclick="filterEvents('all')" class="px-4 py-1.5 rounded-md text-sm font-bold bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white transition event-filter active" data-filter="all">All</button>
+                        <button onclick="filterEvents('online')" class="px-4 py-1.5 rounded-md text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition event-filter" data-filter="online">Online</button>
+                        <button onclick="filterEvents('in-person')" class="px-4 py-1.5 rounded-md text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition event-filter" data-filter="in-person">In Person</button>
+                    </div>
+                </div>
+
+                <div class="space-y-4" id="events-container">
+                    <!-- Events injected via JS -->
+                </div>
+            </div>
+
+            <!-- VIEW: WORKS (Gallery) -->
+            <div id="view-works" class="view-section">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Gallery</h2>
+                </div>
+                <div class="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6" id="gallery-container">
+                    <!-- Gallery injected via JS -->
+                </div>
+            </div>
+
+            <!-- VIEW: TEAM -->
+            <div id="view-team" class="view-section max-w-5xl mx-auto">
+                <div class="bg-slate-900 dark:bg-slate-800 rounded-2xl p-8 text-white mb-8 flex flex-col md:flex-row items-center justify-between shadow-xl">
+                    <div>
+                        <h2 class="text-2xl font-bold mb-2">Join the MAC Family</h2>
+                        <p class="text-slate-400 text-sm max-w-md">We are looking for creatives, developers, and prayer warriors to join our remote team.</p>
+                    </div>
+                    <button onclick="showToast('Application form opened!', 'success')" class="mt-4 md:mt-0 bg-white text-slate-900 px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-slate-100 hover:scale-105 transition">Apply Now</button>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="team-container">
+                    <!-- Team injected via JS -->
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- MOBILE BOTTOM NAVIGATION -->
+    <nav class="md:hidden h-16 bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 flex justify-around items-center px-2 z-30 fixed bottom-0 w-full pb-safe transition-colors duration-300">
+        <button onclick="switchTab('home')" class="mobile-nav-item active flex flex-col items-center justify-center w-full h-full text-slate-400 dark:text-slate-500 transition">
+            <i class="fas fa-home text-lg mb-1"></i>
+            <span class="text-[10px] font-bold">Home</span>
+        </button>
+        <button onclick="switchTab('verse')" class="mobile-nav-item flex flex-col items-center justify-center w-full h-full text-slate-400 dark:text-slate-500 transition">
+            <i class="fas fa-book-open text-lg mb-1"></i>
+            <span class="text-[10px] font-bold">Verse</span>
+        </button>
+        <button onclick="switchTab('events')" class="mobile-nav-item flex flex-col items-center justify-center w-full h-full text-slate-400 dark:text-slate-500 transition relative">
+            <i class="fas fa-calendar-alt text-lg mb-1"></i>
+            <span class="absolute top-3 right-5 w-2 h-2 bg-red-500 rounded-full"></span>
+            <span class="text-[10px] font-bold">Events</span>
+        </button>
+        <button onclick="switchTab('works')" class="mobile-nav-item flex flex-col items-center justify-center w-full h-full text-slate-400 dark:text-slate-500 transition">
+            <i class="fas fa-layer-group text-lg mb-1"></i>
+            <span class="text-[10px] font-bold">Works</span>
+        </button>
+        <button onclick="switchTab('team')" class="mobile-nav-item flex flex-col items-center justify-center w-full h-full text-slate-400 dark:text-slate-500 transition">
+            <i class="fas fa-users text-lg mb-1"></i>
+            <span class="text-[10px] font-bold">Team</span>
+        </button>
+    </nav>
+
+    <!-- GENERIC MODAL -->
+    <div id="app-modal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-lg rounded-2xl shadow-2xl transform scale-95 transition-transform duration-300 flex flex-col max-h-[90vh]" id="modal-content">
+            <!-- Header -->
+            <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                <h3 class="text-lg font-bold text-slate-900 dark:text-white" id="modal-title">Modal Title</h3>
+                <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-red-100 hover:text-red-500 transition flex items-center justify-center">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <!-- Body -->
+            <div class="p-6 overflow-y-auto" id="modal-body">
+                <!-- Content injected here -->
+            </div>
+            <!-- Footer -->
+            <div class="p-4 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-3 bg-slate-50 dark:bg-slate-950/50 rounded-b-2xl">
+                <button onclick="closeModal()" class="px-4 py-2 rounded-lg text-slate-600 dark:text-slate-400 font-bold text-sm hover:bg-slate-200 dark:hover:bg-slate-800 transition">Close</button>
+                <button id="modal-action-btn" class="px-4 py-2 rounded-lg bg-steel-600 text-white font-bold text-sm hover:bg-steel-700 transition shadow-lg shadow-steel-600/20">Action</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed bottom-20 md:bottom-10 right-4 md:right-10 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+        <div id="toast-icon" class="text-green-500"><i class="fas fa-check-circle"></i></div>
+        <div>
+            <h4 class="font-bold text-sm" id="toast-title">Success</h4>
+            <p class="text-xs text-slate-400 dark:text-slate-500" id="toast-message">Action completed.</p>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA STORE ---
+        const verses = [
+            { text: "For I know the plans I have for you, declares the Lord, plans to prosper you and not to harm you, plans to give you hope and a future.", ref: "Jeremiah 29:11", likes: 42 },
+            { text: "I can do all this through him who gives me strength.", ref: "Philippians 4:13", likes: 128 },
+            { text: "The Lord is my shepherd, I lack nothing.", ref: "Psalm 23:1", likes: 89 },
+            { text: "Trust in the Lord with all your heart and lean not on your own understanding.", ref: "Proverbs 3:5", likes: 210 }
+        ];
+
+        const events = [
+            { id: 1, title: "Intercession Prayer", date: "Wed, 06 Oct", time: "7:00 PM", type: "online", location: "Zoom", desc: "Mid-week spiritual recharge. Join us on Zoom.", color: "steel" },
+            { id: 2, title: "Fire Night: Youth", date: "Fri, 08 Oct", time: "6:30 PM", type: "in-person", location: "Main Hall", desc: "A night of unfiltered worship and real talk.", color: "orange" },
+            { id: 3, title: "Sunday Service", date: "Sun, 10 Oct", time: "9:00 AM", type: "online", location: "YouTube Live", desc: "Gather with the family for word and sacrament.", color: "red" },
+            { id: 4, title: "Worship Workshop", date: "Sat, 16 Oct", time: "10:00 AM", type: "in-person", location: "Studio B", desc: "Training for musicians and vocalists.", color: "purple" }
+        ];
+
+        const gallery = [
+            { img: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80", title: "Worship Night", cat: "Events" },
+            { img: "https://images.unsplash.com/photo-1523580494863-6f3031224c94?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80", title: "Studio Sessions", cat: "Music" },
+            { img: "https://images.unsplash.com/photo-1593113598332-cd288d649433?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80", title: "City Food Drive", cat: "Outreach" },
+            { img: "https://images.unsplash.com/photo-1543269865-cbf427effbad?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80", title: "Community Groups", cat: "Fellowship" },
+            { img: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80", title: "Live Recording", cat: "Music" },
+        ];
+
+        const team = [
+            { name: "David K.", role: "Lead Developer", img: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80", socials: ["twitter", "linkedin"] },
+            { name: "Sarah M.", role: "Content Creator", img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80", socials: ["instagram", "envelope"] },
+            { name: "James L.", role: "Video Editor", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80", socials: ["youtube", "instagram"] },
+        ];
+
+        let currentVerseIndex = 0;
+
+        // --- INIT ---
+        window.onload = function() {
+            renderVerse();
+            renderEvents('all');
+            renderGallery();
+            renderTeam();
+            renderHomeFeed();
+            setGreeting();
+        };
+
+        // --- RENDER FUNCTIONS ---
+        function setGreeting() {
+            const hour = new Date().getHours();
+            let greeting = "Good Morning";
+            if (hour >= 12) greeting = "Good Afternoon";
+            if (hour >= 18) greeting = "Good Evening";
+            document.getElementById('greeting-text').innerText = `${greeting}, User 👋`;
+        }
+
+        function renderVerse() {
+            const verse = verses[currentVerseIndex];
+            const html = `
+                <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden relative animate-fade-in">
+                    <div class="h-2 bg-gradient-to-r from-steel-500 to-steel-700"></div>
+                    <div class="p-8 md:p-12 text-center">
+                        <div class="inline-flex items-center justify-center w-12 h-12 bg-steel-50 dark:bg-slate-700 text-steel-600 dark:text-steel-400 rounded-full mb-6">
+                            <i class="fas fa-quote-left"></i>
+                        </div>
+                        <h2 class="text-2xl md:text-3xl font-medium text-slate-800 dark:text-slate-100 leading-relaxed verse-font italic mb-8">
+                            "${verse.text}"
+                        </h2>
+                        <div class="w-16 h-1 bg-steel-200 dark:bg-slate-600 mx-auto mb-6 rounded-full"></div>
+                        <p class="text-steel-700 dark:text-steel-400 font-bold tracking-widest uppercase text-sm">${verse.ref}</p>
+                    </div>
+                    <div class="bg-slate-50 dark:bg-slate-900/50 p-4 flex justify-between items-center border-t border-slate-100 dark:border-slate-800">
+                        <div class="text-xs text-slate-500 dark:text-slate-400 font-bold">${verse.likes} people liked this</div>
+                        <div class="flex gap-2">
+                             <button onclick="showToast('Added to favorites', 'success')" class="w-10 h-10 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-red-500 hover:border-red-200 transition flex items-center justify-center"><i class="fas fa-heart"></i></button>
+                             <button onclick="showToast('Verse copied to clipboard', 'info')" class="w-10 h-10 rounded-full bg-steel-600 text-white hover:bg-steel-700 transition flex items-center justify-center shadow-lg shadow-steel-600/20"><i class="fas fa-share-alt"></i></button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('verse-card-container').innerHTML = html;
+        }
+
+        function renderEvents(filter) {
+            const container = document.getElementById('events-container');
+            container.innerHTML = '';
+            
+            const filteredEvents = filter === 'all' ? events : events.filter(e => e.type === filter);
+            
+            filteredEvents.forEach((e, index) => {
+                const colors = { steel: 'bg-steel-50 text-steel-600', orange: 'bg-orange-50 text-orange-600', red: 'bg-red-50 text-red-600', purple: 'bg-purple-50 text-purple-600' };
+                const badgeColor = colors[e.color] || colors.steel;
+                
+                const html = `
+                    <div onclick="openModal('event', ${e.id})" class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700 flex flex-col md:flex-row gap-6 shadow-sm hover:shadow-md hover:border-steel-200 dark:hover:border-steel-800 transition cursor-pointer animate-slide-up" style="animation-delay: ${index * 0.1}s">
+                        <div class="md:w-28 ${badgeColor} dark:bg-slate-700 dark:text-slate-200 rounded-lg flex flex-col items-center justify-center p-4 border border-slate-100 dark:border-slate-600 text-center">
+                            <span class="text-xs font-bold uppercase opacity-70">${e.date.split(',')[0]}</span>
+                            <span class="text-2xl font-black">${e.date.split(' ')[1]}</span>
+                            <span class="text-xs font-bold uppercase opacity-70">${e.date.split(' ')[2]}</span>
+                        </div>
+                        <div class="flex-1 flex flex-col justify-center">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide">${e.type}</span>
+                                <span class="text-slate-400 text-xs"><i class="far fa-clock"></i> ${e.time}</span>
+                            </div>
+                            <h3 class="text-lg font-bold text-slate-900 dark:text-white">${e.title}</h3>
+                            <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">${e.desc}</p>
+                        </div>
+                        <div class="flex items-center">
+                            <button class="w-full md:w-auto bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 px-4 py-2 rounded-lg text-sm font-bold transition">Details</button>
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', html);
+            });
+        }
+
+        function renderGallery() {
+            const container = document.getElementById('gallery-container');
+            gallery.forEach((item, index) => {
+                const html = `
+                    <div class="break-inside-avoid bg-white dark:bg-slate-800 rounded-xl overflow-hidden shadow-sm border border-slate-100 dark:border-slate-700 group hover:-translate-y-1 transition duration-300 cursor-pointer animate-fade-in">
+                        <div class="relative overflow-hidden">
+                            <img src="${item.img}" class="w-full group-hover:scale-105 transition duration-700">
+                            <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                                <i class="fas fa-expand text-white text-2xl"></i>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-bold text-slate-900 dark:text-white text-sm">${item.title}</h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">${item.cat}</p>
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', html);
+            });
+        }
+
+        function renderTeam() {
+            const container = document.getElementById('team-container');
+            team.forEach((member, index) => {
+                const html = `
+                     <div onclick="openModal('team', '${member.name}')" class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700 flex items-center gap-4 shadow-sm hover:shadow-md transition cursor-pointer animate-slide-up" style="animation-delay: ${index * 0.1}s">
+                        <div class="w-16 h-16 rounded-full bg-slate-200 overflow-hidden border-2 border-white dark:border-slate-600 shadow-sm">
+                            <img src="${member.img}" class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-900 dark:text-white">${member.name}</h3>
+                            <p class="text-xs text-steel-600 dark:text-steel-400 font-bold uppercase">${member.role}</p>
+                            <div class="flex gap-2 mt-2 text-slate-400 text-xs">
+                                ${member.socials.map(s => `<i class="fab fa-${s} hover:text-steel-500"></i>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', html);
+            });
+        }
+        
+        function renderHomeFeed() {
+             const container = document.getElementById('home-feed-container');
+             // Simulated feed
+             const items = [
+                 { title: "New Album 'Awake' Out Now", meta: "MAC Music • Spotify", icon: "music", img: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=80" },
+                 { title: "Community Picnic Photos", meta: "Uploaded 2h ago", icon: "images", img: null },
+             ];
+             
+             items.forEach(i => {
+                 let imgHTML = i.img ? `<div class="w-12 h-12 rounded-lg overflow-hidden"><img src="${i.img}" class="w-full h-full object-cover"></div>` : `<div class="w-12 h-12 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400"><i class="fas fa-${i.icon}"></i></div>`;
+                 
+                 const html = `
+                    <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700 flex gap-4 items-center shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700/50 transition cursor-pointer">
+                        ${imgHTML}
+                        <div class="flex-1">
+                            <h4 class="font-bold text-slate-900 dark:text-white text-sm">${i.title}</h4>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">${i.meta}</p>
+                        </div>
+                        <button class="text-slate-300 hover:text-steel-600"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                 `;
+                 container.insertAdjacentHTML('beforeend', html);
+             });
+        }
+
+        // --- INTERACTION FUNCTIONS ---
+
+        function switchTab(tabId) {
+            // Update UI Views
+            document.querySelectorAll('.view-section').forEach(view => {
+                view.classList.remove('active');
+            });
+            const selectedView = document.getElementById('view-' + tabId);
+            if(selectedView) selectedView.classList.add('active');
+
+            // Update Nav States
+            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+            const selectedNav = document.getElementById('nav-' + tabId);
+            if(selectedNav) selectedNav.classList.add('active');
+
+            document.querySelectorAll('.mobile-nav-item').forEach(nav => {
+                nav.classList.remove('active', 'text-steel-700', 'dark:text-steel-400');
+                nav.classList.add('text-slate-400', 'dark:text-slate-500');
+            });
+            const indexMap = { 'home': 0, 'verse': 1, 'events': 2, 'works': 3, 'team': 4 };
+            const mobileNavs = document.querySelectorAll('.mobile-nav-item');
+            if(mobileNavs[indexMap[tabId]]) {
+                const activeMobile = mobileNavs[indexMap[tabId]];
+                activeMobile.classList.add('active', 'text-steel-700', 'dark:text-steel-400');
+                activeMobile.classList.remove('text-slate-400', 'dark:text-slate-500');
+            }
+
+            // Update Title
+            const titles = { 'home': 'Dashboard', 'verse': 'MACverse', 'events': 'Events', 'works': 'Gallery', 'team': 'MACers' };
+            document.getElementById('page-title').innerText = titles[tabId];
+            
+            // Scroll to top
+            document.getElementById('main-scroll').scrollTop = 0;
+        }
+        
+        function nextVerse() {
+            currentVerseIndex = (currentVerseIndex + 1) % verses.length;
+            renderVerse();
+        }
+        
+        function previousVerse() {
+             currentVerseIndex = (currentVerseIndex - 1 + verses.length) % verses.length;
+            renderVerse();
+        }
+        
+        function filterEvents(type) {
+            // Update button styles
+            document.querySelectorAll('.event-filter').forEach(btn => {
+                if(btn.dataset.filter === type) {
+                    btn.classList.add('bg-slate-100', 'dark:bg-slate-700', 'text-slate-900', 'dark:text-white');
+                    btn.classList.remove('text-slate-500', 'dark:text-slate-400');
+                } else {
+                    btn.classList.remove('bg-slate-100', 'dark:bg-slate-700', 'text-slate-900', 'dark:text-white');
+                    btn.classList.add('text-slate-500', 'dark:text-slate-400');
+                }
+            });
+            renderEvents(type);
+        }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            if(html.classList.contains('dark')) {
+                html.classList.remove('dark');
+            } else {
+                html.classList.add('dark');
+            }
+        }
+        
+        function toggleNotifications() {
+            const dropdown = document.getElementById('notification-dropdown');
+            dropdown.classList.toggle('hidden');
+        }
+
+        // --- MODAL & TOAST ---
+        function openModal(type, data) {
+            const modal = document.getElementById('app-modal');
+            const overlay = modal; 
+            const content = document.getElementById('modal-content');
+            const title = document.getElementById('modal-title');
+            const body = document.getElementById('modal-body');
+            const actionBtn = document.getElementById('modal-action-btn');
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+                content.classList.add('scale-100');
+            }, 10);
+
+            if(type === 'event') {
+                const event = events.find(e => e.id === data);
+                title.innerText = event.title;
+                body.innerHTML = `
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-3 text-slate-500 dark:text-slate-300">
+                            <i class="far fa-calendar text-xl w-6 text-center"></i> ${event.date}
+                        </div>
+                        <div class="flex items-center gap-3 text-slate-500 dark:text-slate-300">
+                            <i class="far fa-clock text-xl w-6 text-center"></i> ${event.time}
+                        </div>
+                        <div class="flex items-center gap-3 text-slate-500 dark:text-slate-300">
+                            <i class="fas fa-map-marker-alt text-xl w-6 text-center"></i> ${event.location}
+                        </div>
+                        <p class="text-slate-600 dark:text-slate-400 leading-relaxed pt-2">${event.desc}</p>
+                    </div>
+                `;
+                actionBtn.innerText = "Join Event";
+                actionBtn.onclick = () => { closeModal(); showToast('You have joined ' + event.title, 'success'); };
+            } else if (type === 'team') {
+                 const member = team.find(m => m.name === data);
+                 title.innerText = member.name;
+                 body.innerHTML = `
+                    <div class="text-center">
+                        <img src="${member.img}" class="w-24 h-24 rounded-full mx-auto mb-4 border-4 border-slate-100 dark:border-slate-700">
+                        <h4 class="text-xl font-bold dark:text-white">${member.role}</h4>
+                        <p class="text-slate-500 mt-2">Passionate about using technology to spread the Gospel. Connect with me on social media!</p>
+                    </div>
+                 `;
+                 actionBtn.innerText = "Connect";
+                 actionBtn.onclick = () => { closeModal(); showToast('Connection request sent!', 'info'); };
+            } else if (type === 'video') {
+                title.innerText = data.title;
+                body.innerHTML = `<div class="aspect-video bg-black flex items-center justify-center text-white rounded-lg"><i class="fas fa-play text-4xl"></i></div><p class="mt-4 text-slate-500 text-sm">Video playback simulation.</p>`;
+                actionBtn.innerText = "Watch Full";
+            }
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('app-modal');
+            const content = document.getElementById('modal-content');
+            
+            modal.classList.add('opacity-0');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        function showToast(message, type) {
+            const toast = document.getElementById('toast');
+            const title = document.getElementById('toast-title');
+            const msg = document.getElementById('toast-message');
+            const icon = document.getElementById('toast-icon');
+
+            title.innerText = type === 'success' ? 'Success' : 'Info';
+            msg.innerText = message;
+            
+            if(type === 'success') icon.className = "text-green-500 text-xl";
+            else icon.className = "text-blue-500 text-xl";
+            
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+        
+        function handleSearch() {
+            const query = document.getElementById('globalSearch').value.toLowerCase();
+            // In a real app, this would filter data arrays and re-render
+            // For demo, we just log
+            if(query.length > 2) {
+                console.log("Searching for:", query);
+            }
+        }
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EdenNexus.in - Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Smooth height transition for fields */
+        .height-transition {
+            transition: height 0.3s ease-in-out, opacity 0.3s ease-in-out, margin 0.3s ease;
+        }
+        .h-0-important { height: 0 !important; margin: 0 !important; opacity: 0 !important; }
+        .h-16-important { height: 4rem !important; opacity: 1 !important; }
+        
+        /* Animation classes */
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .animate-spin-custom {
+            animation: spin 1s linear infinite;
+        }
+        .animate-pulse-custom {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+        /* Letter spacing for OTP input */
+        .tracking-widest-2 {
+            letter-spacing: 0.5em;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-slate-200 via-gray-100 to-blue-50 flex items-center justify-center p-4 font-sans text-slate-800">
+
+    <!-- Main Card -->
+    <div id="main-card" class="bg-white w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row h-[600px] transition-all duration-500 ease-in-out">
+        
+        <!-- Left Side - Image/Branding -->
+        <div id="image-panel" class="order-first hidden md:flex flex-col justify-center items-center w-1/2 p-12 bg-gradient-to-br from-slate-700 to-blue-900 text-white relative overflow-hidden transition-all duration-500">
+            <!-- Decorative Circles -->
+            <div class="absolute top-[-50px] left-[-50px] w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
+            <div class="absolute bottom-[-50px] right-[-50px] w-60 h-60 bg-white/10 rounded-full blur-3xl"></div>
+            
+            <div class="relative z-10 text-center">
+                <h2 id="panel-title" class="text-4xl font-bold mb-6">Welcome Back!</h2>
+                <p id="panel-text" class="text-slate-200 text-lg mb-8 leading-relaxed">
+                    To keep connected with EdenNexus please login with your personal info.
+                </p>
+                <button id="toggle-btn-desktop" class="px-8 py-3 border-2 border-white rounded-full font-semibold hover:bg-white hover:text-slate-800 transition-colors duration-300">
+                    Sign Up
+                </button>
+            </div>
+        </div>
+
+        <!-- Right Side - Form -->
+        <div id="form-panel" class="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center bg-white relative">
+            
+            <div class="max-w-md mx-auto w-full">
+                <!-- EdenNexus Branding -->
+                <div class="flex justify-center mb-6">
+                    <div class="flex items-center gap-2 text-slate-800 font-bold text-2xl tracking-tight">
+                        <i data-lucide="hexagon" class="text-blue-700 stroke-[2.5px]"></i>
+                        <span>EdenNexus<span class="text-blue-700">.in</span></span>
+                    </div>
+                </div>
+
+                <div class="text-center mb-8">
+                    <h1 id="form-title" class="text-3xl font-bold text-slate-800 mb-2">Sign in to Account</h1>
+                    
+                    <!-- Social Login Buttons -->
+                    <div class="flex justify-center gap-4 mt-6 mb-6">
+                        <button class="p-2 border border-slate-200 rounded-full hover:bg-slate-50 transition-colors group" title="Sign in with Google">
+                            <div class="w-5 h-5 flex items-center justify-center text-xs font-bold text-slate-500 group-hover:text-blue-700">G</div>
+                        </button>
+                        <button class="p-2 border border-slate-200 rounded-full hover:bg-slate-50 transition-colors group" title="Sign in with Facebook">
+                            <div class="w-5 h-5 flex items-center justify-center text-xs font-bold text-slate-500 group-hover:text-blue-700">F</div>
+                        </button>
+                        <button class="p-2 border border-slate-200 rounded-full hover:bg-slate-50 transition-colors group" title="Sign in with LinkedIn">
+                            <div class="w-5 h-5 flex items-center justify-center text-xs font-bold text-slate-500 group-hover:text-blue-700">L</div>
+                        </button>
+                    </div>
+                    <p class="text-slate-400 text-sm">or use your email account</p>
+                </div>
+
+                <form id="auth-form" class="space-y-4">
+                    
+                    <!-- Name Input (Hidden by default for login) -->
+                    <div id="name-container" class="height-transition overflow-hidden h-0 opacity-0">
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                                <i data-lucide="user" width="18" height="18"></i>
+                            </div>
+                            <input type="text" id="name" placeholder="Full Name" class="w-full pl-10 pr-4 py-3 bg-slate-50 border-none rounded-lg focus:ring-2 focus:ring-slate-500 transition-all outline-none disabled:bg-slate-100 disabled:text-slate-500">
+                        </div>
+                    </div>
+
+                    <!-- Email Input -->
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                            <i data-lucide="mail" width="18" height="18"></i>
+                        </div>
+                        <input type="email" id="email" placeholder="Email Address" required class="w-full pl-10 pr-4 py-3 bg-slate-50 border-none rounded-lg focus:ring-2 focus:ring-slate-500 transition-all outline-none disabled:bg-slate-100 disabled:text-slate-500">
+                        <!-- Edit Email Button (Visible only when OTP is sent) -->
+                        <button type="button" id="edit-email-btn" class="hidden absolute inset-y-0 right-0 pr-3 flex items-center text-blue-600 hover:text-blue-800 text-xs font-bold">
+                            CHANGE
+                        </button>
+                    </div>
+
+                    <!-- OTP Input (Hidden by default) -->
+                    <div id="otp-container" class="height-transition overflow-hidden h-0 opacity-0">
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                                <i data-lucide="key-round" width="18" height="18"></i>
+                            </div>
+                            <input type="text" id="otp" placeholder="Enter 6-digit Code" maxlength="6" class="w-full pl-10 pr-4 py-3 bg-slate-50 border-none rounded-lg focus:ring-2 focus:ring-slate-500 transition-all outline-none tracking-widest-2 font-mono text-center">
+                        </div>
+                        <div class="flex justify-between items-center mt-2 px-1">
+                            <span class="text-xs text-slate-400">Code sent to your email</span>
+                            <button type="button" id="resend-otp" class="text-xs text-blue-700 hover:text-blue-900 font-bold">Resend Code</button>
+                        </div>
+                    </div>
+
+                    <!-- Error Message -->
+                    <div id="error-message" class="hidden flex items-center text-red-500 text-sm mt-2 animate-pulse-custom">
+                        <i data-lucide="alert-circle" width="16" height="16" class="mr-2"></i>
+                        <span id="error-text"></span>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" id="submit-btn" class="w-full py-3 rounded-lg font-bold text-white shadow-lg bg-slate-700 hover:bg-slate-800 hover:-translate-y-1 transform transition-all duration-300 flex items-center justify-center gap-2">
+                        <span id="btn-text">Get Login Code</span>
+                        <i id="btn-icon" data-lucide="arrow-right" width="18" height="18"></i>
+                    </button>
+                </form>
+
+                <!-- Mobile Toggle -->
+                <div class="md:hidden mt-8 text-center">
+                    <p class="text-slate-600">
+                        <span id="mobile-toggle-text">Don't have an account? </span>
+                        <button id="toggle-btn-mobile" class="text-blue-700 font-bold hover:underline">
+                            Sign Up
+                        </button>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // State Tracking
+        let isLogin = true;
+        let otpSent = false;
+
+        // DOM Elements
+        const form = document.getElementById('auth-form');
+        const emailInput = document.getElementById('email');
+        const nameInput = document.getElementById('name');
+        const otpInput = document.getElementById('otp');
+        
+        const imagePanel = document.getElementById('image-panel');
+        const panelTitle = document.getElementById('panel-title');
+        const panelText = document.getElementById('panel-text');
+        
+        const formTitle = document.getElementById('form-title');
+        const nameContainer = document.getElementById('name-container');
+        const otpContainer = document.getElementById('otp-container');
+        const editEmailBtn = document.getElementById('edit-email-btn');
+        const resendOtpBtn = document.getElementById('resend-otp');
+        
+        const submitBtn = document.getElementById('submit-btn');
+        const btnText = document.getElementById('btn-text');
+        const btnIcon = document.getElementById('btn-icon');
+        const errorMessage = document.getElementById('error-message');
+        const errorText = document.getElementById('error-text');
+        
+        const toggleBtnDesktop = document.getElementById('toggle-btn-desktop');
+        const toggleBtnMobile = document.getElementById('toggle-btn-mobile');
+        const mobileToggleText = document.getElementById('mobile-toggle-text');
+
+        // Functions
+        function resetFormState() {
+            otpSent = false;
+            emailInput.value = '';
+            nameInput.value = '';
+            otpInput.value = '';
+            errorMessage.classList.add('hidden');
+            
+            // Enable inputs
+            emailInput.disabled = false;
+            nameInput.disabled = false;
+            
+            // Hide OTP, Show/Hide Name based on mode
+            otpContainer.classList.remove('h-16-important', 'opacity-100');
+            otpContainer.classList.add('h-0-important', 'opacity-0');
+            otpInput.removeAttribute('required');
+            
+            editEmailBtn.classList.add('hidden');
+            
+            // Reset Button
+            updateButtonState();
+        }
+
+        function updateButtonState() {
+            if (otpSent) {
+                btnText.innerText = "Verify & Login";
+                btnIcon.setAttribute('data-lucide', 'check');
+            } else {
+                btnText.innerText = "Get Login Code";
+                btnIcon.setAttribute('data-lucide', 'arrow-right');
+            }
+            lucide.createIcons();
+        }
+
+        function toggleMode() {
+            isLogin = !isLogin;
+            resetFormState();
+
+            if (isLogin) {
+                // Switch to Login
+                imagePanel.classList.remove('order-last');
+                imagePanel.classList.add('order-first');
+                
+                panelTitle.innerText = "Welcome Back!";
+                panelText.innerText = "To keep connected with EdenNexus please login with your personal info.";
+                toggleBtnDesktop.innerText = "Sign Up";
+                
+                formTitle.innerText = "Sign in to Account";
+                
+                nameContainer.classList.remove('h-16-important', 'opacity-100');
+                nameContainer.classList.add('h-0-important', 'opacity-0');
+                nameInput.removeAttribute('required');
+                
+                mobileToggleText.innerText = "Don't have an account? ";
+                toggleBtnMobile.innerText = "Sign Up";
+            } else {
+                // Switch to Sign Up
+                imagePanel.classList.remove('order-first');
+                imagePanel.classList.add('order-last');
+                
+                panelTitle.innerText = "Join Us Today";
+                panelText.innerText = "Enter your personal details and start journey with EdenNexus.";
+                toggleBtnDesktop.innerText = "Sign In";
+                
+                formTitle.innerText = "Create Account";
+                
+                nameContainer.classList.remove('h-0-important', 'opacity-0');
+                nameContainer.classList.add('h-16-important', 'opacity-100');
+                nameInput.setAttribute('required', 'true');
+                
+                mobileToggleText.innerText = "Already have an account? ";
+                toggleBtnMobile.innerText = "Sign In";
+            }
+        }
+
+        function handleSendOtp() {
+            // Validate Email
+            const email = emailInput.value;
+            if (!email.includes('@')) {
+                showError("Please enter a valid email address.");
+                return;
+            }
+
+            setLoading(true);
+            
+            // Simulate Network Request
+            setTimeout(() => {
+                setLoading(false);
+                otpSent = true;
+                
+                // UI Changes for OTP Mode
+                emailInput.disabled = true;
+                nameInput.disabled = true;
+                editEmailBtn.classList.remove('hidden');
+                
+                otpContainer.classList.remove('h-0-important', 'opacity-0');
+                otpContainer.classList.add('h-16-important', 'opacity-100');
+                otpInput.setAttribute('required', 'true');
+                otpInput.focus();
+                
+                updateButtonState();
+                
+                // Show temporary success message
+                showError("Code sent! (Simulated: 123456)");
+                errorMessage.classList.replace('text-red-500', 'text-green-600');
+                errorMessage.querySelector('svg').setAttribute('stroke', '#16a34a'); // Green icon
+                
+                // Reset error style after 3s
+                setTimeout(() => {
+                    if(errorMessage.classList.contains('text-green-600')) {
+                        errorMessage.classList.add('hidden');
+                        errorMessage.classList.replace('text-green-600', 'text-red-500');
+                        lucide.createIcons(); // Reset icon color if needed via re-render, though stroke manipulation works
+                    }
+                }, 3000);
+
+            }, 1000);
+        }
+
+        function handleVerifyOtp() {
+            const otp = otpInput.value;
+            if (otp.length < 6) {
+                // Reset styling to error
+                errorMessage.classList.replace('text-green-600', 'text-red-500');
+                showError("Please enter a valid 6-digit code.");
+                return;
+            }
+
+            setLoading(true);
+
+            // Simulate Verification
+            setTimeout(() => {
+                setLoading(false);
+                setSuccess(true);
+            }, 1500);
+        }
+
+        function setLoading(loading) {
+            if (loading) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = `<i data-lucide="loader-2" class="animate-spin-custom"></i>`;
+                lucide.createIcons();
+            } else {
+                submitBtn.disabled = false;
+                updateButtonState(); // Restores text based on otpSent state
+            }
+        }
+
+        function setSuccess(success) {
+            submitBtn.className = "w-full py-3 rounded-lg font-bold text-white shadow-lg bg-green-500 hover:bg-green-600 transform transition-all duration-300 flex items-center justify-center gap-2";
+            submitBtn.innerHTML = `<i data-lucide="check-circle" width="20" height="20"></i> ${isLogin ? "Welcome Back!" : "Account Created!"}`;
+            lucide.createIcons();
+
+            setTimeout(() => {
+                // Reset button style
+                submitBtn.className = "w-full py-3 rounded-lg font-bold text-white shadow-lg bg-slate-700 hover:bg-slate-800 hover:-translate-y-1 transform transition-all duration-300 flex items-center justify-center gap-2";
+                
+                // If we finished a flow, reset everything
+                resetFormState();
+                
+                // If it was signup, switch to login for the next user interaction
+                if (!isLogin) {
+                   toggleMode(); 
+                }
+            }, 2000);
+        }
+
+        function showError(msg) {
+            errorMessage.classList.remove('hidden');
+            errorText.innerText = msg;
+        }
+
+        function editEmail() {
+            otpSent = false;
+            otpInput.value = '';
+            errorMessage.classList.add('hidden');
+            
+            emailInput.disabled = false;
+            nameInput.disabled = false;
+            editEmailBtn.classList.add('hidden');
+            
+            otpContainer.classList.remove('h-16-important', 'opacity-100');
+            otpContainer.classList.add('h-0-important', 'opacity-0');
+            otpInput.removeAttribute('required');
+            
+            updateButtonState();
+            emailInput.focus();
+        }
+
+        // Event Listeners
+        toggleBtnDesktop.addEventListener('click', toggleMode);
+        toggleBtnMobile.addEventListener('click', toggleMode);
+        
+        editEmailBtn.addEventListener('click', editEmail);
+        
+        resendOtpBtn.addEventListener('click', () => {
+             // Visual feedback for resend
+             resendOtpBtn.innerText = "Sent!";
+             setTimeout(() => { resendOtpBtn.innerText = "Resend Code"; }, 2000);
+             showError("New code sent! (Simulated: 123456)");
+             errorMessage.classList.replace('text-red-500', 'text-green-600');
+        });
+
+        // Clear error on input
+        [emailInput, otpInput, nameInput].forEach(input => {
+            input.addEventListener('input', () => {
+                if (!errorMessage.classList.contains('hidden') && errorMessage.classList.contains('text-red-500')) {
+                    errorMessage.classList.add('hidden');
+                }
+            });
+        });
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (otpSent) {
+                handleVerifyOtp();
+            } else {
+                handleSendOtp();
+            }
+        });
+
+    </script>
+</body>
+</html>

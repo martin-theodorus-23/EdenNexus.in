@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EdenNexus | Upgrade</title>
+    <style>
+        :root { --bg: #121212; --surface: #1e1e1e; --border: #2c2c2c; --text: #e0e0e0; --text-muted: #888; }
+        * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { margin: 0; background: var(--bg); color: var(--text); line-height: 1.6; padding-bottom: 4rem;}
+        
+        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 2rem; border-bottom: 1px solid var(--border); }
+        .brand { font-size: 1.25rem; font-weight: 600; letter-spacing: -0.5px; }
+        .btn-back { color: var(--text-muted); text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
+        .btn-back:hover { color: #fff; }
+
+        .container { max-width: 1000px; margin: 4rem auto 0; padding: 0 2rem; text-align: center; }
+        .container h1 { font-size: 2.5rem; font-weight: 600; margin: 0 0 0.5rem 0; letter-spacing: -1px; }
+        .container p { color: var(--text-muted); margin: 0 0 3rem 0; font-size: 1.1rem; }
+
+        .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; text-align: left; }
+        
+        .plan-card {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+            padding: 2.5rem 2rem; display: flex; flex-direction: column; transition: transform 0.2s, border-color 0.2s;
+        }
+        .plan-card:hover { transform: translateY(-3px); border-color: #555; }
+        .plan-card.popular { border-color: #4ade80; position: relative; }
+        .popular-badge {
+            position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+            background: #4ade80; color: #000; font-size: 0.75rem; font-weight: 600;
+            padding: 4px 12px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+
+        .plan-name { font-size: 1.2rem; font-weight: 500; margin: 0 0 0.5rem 0; }
+        .plan-price { font-size: 2.5rem; font-weight: 600; margin: 0 0 1.5rem 0; letter-spacing: -1px; }
+        .plan-price span { font-size: 1rem; color: var(--text-muted); font-weight: 400; }
+        
+        ul { list-style: none; padding: 0; margin: 0 0 2rem 0; flex-grow: 1; }
+        li { margin-bottom: 0.75rem; color: var(--text-muted); font-size: 0.95rem; display: flex; align-items: center; gap: 8px; }
+        li::before { content: "✓"; color: #4ade80; font-weight: bold; }
+
+        .btn {
+            width: 100%; padding: 0.85rem; background: transparent; color: #fff; border: 1px solid var(--border);
+            border-radius: 6px; font-weight: 500; font-size: 0.95rem; cursor: pointer; text-align: center;
+            text-decoration: none; transition: all 0.2s;
+        }
+        .btn:hover { background: #fff; color: #000; }
+        .btn-primary { background: #fff; color: #000; border: none; }
+        .btn-primary:hover { background: #e0e0e0; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="brand">EdenNexus</div>
+        <a href="{{ url_for('index') }}" class="btn-back">← Back to Dashboard</a>
+    </nav>
+
+    <div class="container">
+        <h1>Select your access tier</h1>
+        <p>Upgrade your node to unlock advanced API features and AutoBot limits.</p>
+
+        <div class="pricing-grid">
+            <div class="plan-card">
+                <h3 class="plan-name">Standard Node</h3>
+                <div class="plan-price">Free</div>
+                <ul>
+                    <li>Level 1 (LVL_1) Access</li>
+                    <li>Basic API usage (100 req/day)</li>
+                    <li>Standard support</li>
+                </ul>
+                <a href="{{ url_for('index') }}" class="btn">Current Plan</a>
+            </div>
+
+            <div class="plan-card popular">
+                <div class="popular-badge">Recommended</div>
+                <h3 class="plan-name">Pro Uplink</h3>
+                <div class="plan-price">₹499<span>/mo</span></div>
+                <ul>
+                    <li>Level 2 (LVL_2) Access</li>
+                    <li>Advanced API (10,000 req/day)</li>
+                    <li>AutoBot Scheduling</li>
+                    <li>Priority support</li>
+                </ul>
+                <a href="{{ url_for('checkout', tier='pro') }}" class="btn btn-primary">Upgrade to Pro</a>
+            </div>
+
+            <div class="plan-card">
+                <h3 class="plan-name">Nexus Core</h3>
+                <div class="plan-price">₹1499<span>/mo</span></div>
+                <ul>
+                    <li>Level 3 (LVL_3) Access</li>
+                    <li>Unlimited API usage</li>
+                    <li>Full ecosystem orchestration</li>
+                    <li>Dedicated server node</li>
+                </ul>
+                <a href="{{ url_for('checkout', tier='nexus') }}" class="btn">Upgrade to Nexus</a>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
